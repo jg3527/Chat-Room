@@ -1,0 +1,90 @@
+
+Computer Networks Project 1 -- jg3527
+Programming Design
+==================
+1. Data structure£º Please see the commments in the .java files.
+2. General design: 
+1) Except the login part, all messages send between users and server including heartbeat mechanism is one message per connection. Once user logged in or after 1 min this connection which used for login will close.
+2) When the server killed by ctrl + c it will send all online users that it is going to shutdown. users trying to login in will be noticed once they finished their input. If the client side terminated by ctrl +  it will tell the server first.
+3) Implemented all the required functions including the bonus part of the p2p. If you hava any question, please contact me.
+
+2. How the program works:
+1) For the server part:
+
+Server.java:
+1) It has a welcome socket. Once a client want to connect with it it starts a ServerThread.
+ServerThread.java:
+2) It judges the whether the user has logged in already or not by looking at the IP address. So, two different clients can not user the same IP address.
+3) If the user has not login, it will let user login first. Once the user login successfully, it will start 
+ServerHeartBeatThread.
+4) If the user has already logined it will process the users' request.
+
+ServerHeartBeatThread.java
+Used to implement the heartbeat mechanism. Every 40s it will check Server.heartBeat for a specific user. If Server.heartBeat.get(user) is false, it will know this user is offline. Otherwise it will set the value for this user false.
+
+MyProtocol.java:
+Record protocol words.
+
+Debug.java:
+Used to debug.
+
+2) For the client part:
+
+Client.java
+1)It will first connect to the sever and let user login.
+2)After user login successfully:
+a. It start a Heartbeathread which every 30s send "alive" signal to server.
+b. It start a welcome socket which will be used to "listen" messages from the server or other users, once it receives a request it will start a ClientThread thread.
+c. It start a UserInputListener thread.
+UserInputListener.java
+Used to judge whether the input of the user is valid or not and if it is not valid it will notice user otherwise it will send this message to server or the user.
+
+
+ClientThread.java:
+It processes the message from the user or the server.
+
+MyProtocol.java:
+Record protocol words.
+
+Debug.java:
+Used to debug.
+
+How to Compile and Run the Program
+==================================
+Note: After the client logout or offline due to some reason.Please start a new terminal and close this one.
+
+Change the filepath in Server.java for the credentials.txt.
+Open a terminal and go to the director of the files for Server side and type "make" first.
+Then run "java Server <port number>" (eg: "java Server 9000").
+Open a terminal and go to the director of the files for Client side and type "make" first.
+Then run "java Client <hostname of server> <port number>" (eg: "java Client 127.0.0.1 9000").
+"make clean" can be used to delete .class files.
+Sample commands
+===============
+jg3527@tripoli:~/Desktop/1909/Client$ make clean
+rm -f *.class
+jg3527@tripoli:~/Desktop/1909/Client$ make
+javac -g UserInputListener.java
+jg3527@tripoli:~/Desktop/1909/Client$ java Client 127.0.0.1 9000
+> Please note that you need to login in 1 min. Otherwise you need to restart program to login. Username: 
+columbia
+> Password: 
+116bway
+> Welcome to simple chat server.
+> Login successfully.
+message seas
+Invalid input, please try again.
+Invalid input, please try again.
+message seas hi
+online
+> You are the only online person.
+getaddress seas
+> seas is offline.
+block seas
+> seas has been blocked successfully.
+unblock seas
+> seas has been unblocked successfully
+
+Additional features
+===================
+Implemented the advanced P2P features.
